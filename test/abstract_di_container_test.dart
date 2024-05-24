@@ -132,14 +132,14 @@ void main() {
     final TestRegistry di = TestRegistry.instance;
 
     test('Factory put', () {
-      di.put(FactoryRegistrar(() => SomeService(0)));
+      di.put(SyncFactoryRegistrar(() => SomeService(0)));
 
       expect(di.instanceMap.length, 3);
     });
 
     test('Factory double put testing', () {
       try {
-        di.put(FactoryRegistrar(() => SomeService(0)));
+        di.put(SyncFactoryRegistrar(() => SomeService(0)));
 
         expect(di.instanceMap.length, 3);
       } catch (e) {

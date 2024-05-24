@@ -24,10 +24,10 @@ class SingletonRegistrar<T> implements Registrar<T> {
   void dispose() {}
 }
 
-class FactoryRegistrar<T> implements SyncFactory<T> {
+class SyncFactoryRegistrar<T> implements SyncFactory<T> {
   final T Function() _constructor;
 
-  const FactoryRegistrar(this._constructor);
+  const SyncFactoryRegistrar(this._constructor);
 
   @override
   SyncFactory<T> get instance => this;
