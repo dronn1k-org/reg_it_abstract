@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reg_it_abstract/reg_it_abstraction.dart';
+import 'package:reg_it_abstract/reg_it_abstract.dart';
 
 class TestRegistry implements Registry {
   final Map<Type, Registrar> _instanceMap = {};
