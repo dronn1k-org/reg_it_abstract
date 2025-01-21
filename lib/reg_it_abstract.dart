@@ -1,89 +1,82 @@
 library reg_it_abstract;
 
+import 'package:flutter/foundation.dart';
+
 abstract interface class Registrar<T> {
   T get instance;
 
   void dispose();
 }
 
-abstract class SyncFactory<T> implements Registrar<SyncFactory<T>> {
-  T call();
+mixin DisposeHandler<T> implements Registrar<T> {
+  @protected
+  abstract final void Function(Registrar<T> registrar)? beforeDispose;
+
+  @override
+  @mustCallSuper
+  void dispose() => beforeDispose?.call(this);
 }
 
-abstract class AsyncFactory<T> implements Registrar<AsyncFactory<T>> {
-  Future<T> call();
-}
-
-class SingletonRegistrar<T> implements Registrar<T> {
+class SingletonRegistrar<T> with DisposeHandler<T> implements Registrar<T> {
   @override
   final T instance;
 
-  const SingletonRegistrar(this.instance);
-
   @override
-  void dispose() {}
+  final void Function(Registrar<T> registrar)? beforeDispose;
+
+  const SingletonRegistrar(this.instance, [this.beforeDispose]);
 }
 
-class SyncFactoryRegistrar<T> implements SyncFactory<T> {
+class InstanceFactoryRegistrar<T>
+    with DisposeHandler<T>
+    implements Registrar<T> {
   final T Function() _constructor;
 
-  const SyncFactoryRegistrar(this._constructor);
+  InstanceFactoryRegistrar(this._constructor, [this.beforeDispose]);
 
   @override
-  SyncFactory<T> get instance => this;
+  T get instance => _constructor();
 
   @override
-  T call() => _constructor();
-
-  @override
-  void dispose() {}
+  final void Function(Registrar<T> registrar)? beforeDispose;
 }
 
-class AsyncFactoryRegistrar<T> implements AsyncFactory<T> {
-  final Future<T> Function() _constructor;
-
-  AsyncFactoryRegistrar(this._constructor);
-
-  @override
-  Future<T> call() => _constructor();
-
-  @override
-  AsyncFactory<T> get instance => this;
-
-  @override
-  void dispose() {}
-}
-
-class LazySingletonRegistrar<T> implements Registrar<T> {
+class LazySingletonRegistrar<T> with DisposeHandler<T> implements Registrar<T> {
   T? _instance;
 
   final T Function() _constructor;
 
-  LazySingletonRegistrar(this._constructor);
+  LazySingletonRegistrar(this._constructor, [this.beforeDispose]);
 
   @override
   T get instance => _instance ??= _constructor();
 
   @override
-  void dispose() {}
+  final void Function(Registrar<T> registrar)? beforeDispose;
+}
+
+class WeakSingletonRegistrar<T extends Object>
+    with DisposeHandler<T>
+    implements Registrar<T> {
+  @override
+  final void Function(Registrar<T> registrar)? beforeDispose;
+
+  @override
+  T get instance {
+    if (_weakReference?.target != null) return _weakReference!.target!;
+
+    return (_weakReference = WeakReference(_instanceBuilder())).target!;
+  }
+
+  final T Function() _instanceBuilder;
+
+  WeakReference<T>? _weakReference;
+
+  WeakSingletonRegistrar(this._instanceBuilder, [this.beforeDispose]);
 }
 
 abstract interface class Registry {
   void put<T>(final Registrar<T> registrar);
   T get<T>();
   void drop<T>();
-}
-
-abstract class SmartFactory<T, A> implements Registrar<SmartFactory<T, A>> {
-  abstract final T Function(A args) builder;
-
-  T call(A args);
-}
-
-class SmartFactoryRegistrar<T, A> {
-  final T Function(A args) builder;
-
-  SmartFactoryRegistrar(this.builder);
-
-  T call(A args) => builder(args);
 }

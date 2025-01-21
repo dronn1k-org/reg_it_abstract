@@ -58,17 +58,6 @@ class SomeService {
   SomeService(this.temp);
 }
 
-class ServiceFactory extends SmartFactoryRegistrar<SomeService, int>
-    implements Registrar<ServiceFactory> {
-  ServiceFactory(super.builder);
-
-  @override
-  void dispose() {}
-
-  @override
-  ServiceFactory get instance => this;
-}
-
 void main() {
   group('DI put & get testing', () {
     final TestRegistry di = TestRegistry.instance;
@@ -103,58 +92,6 @@ void main() {
     });
   });
 
-  group('Future factory testing', () {
-    final TestRegistry di = TestRegistry.instance;
-    test('Future registrar put tests', () {
-      try {
-        di.put(AsyncFactoryRegistrar(() async => SomeService(0)));
-        expect(di.instanceMap.length, 2);
-      } catch (e) {
-        expect(di.instanceMap.length, 2);
-      }
-    });
-
-    test('Future registrar getting a new instance', () async {
-      final firstIntFactory = di.get<AsyncFactory<SomeService>>();
-      final secondIntFactory = di.get<AsyncFactory<SomeService>>();
-
-      expect(firstIntFactory == secondIntFactory, true);
-
-      expect((await firstIntFactory()) != (await secondIntFactory()), true);
-
-      final tempService = di.get<SomeService>();
-
-      expect((await firstIntFactory()) != tempService, true);
-    });
-  });
-
-  group('Factory registrars testing', () {
-    final TestRegistry di = TestRegistry.instance;
-
-    test('Factory put', () {
-      di.put(SyncFactoryRegistrar(() => SomeService(0)));
-
-      expect(di.instanceMap.length, 3);
-    });
-
-    test('Factory double put testing', () {
-      try {
-        di.put(SyncFactoryRegistrar(() => SomeService(0)));
-
-        expect(di.instanceMap.length, 3);
-      } catch (e) {
-        expect(di.instanceMap.length, 3);
-      }
-    });
-
-    test('get factory', () {
-      final firstService = di.get<SyncFactory<SomeService>>()();
-      final secondService = di.get<SyncFactory<SomeService>>()();
-
-      expect(firstService != secondService, true);
-    });
-  });
-
   group('drop testing', () {
     final TestRegistry di = TestRegistry.instance;
     test('drop a non existing object', () {
@@ -173,33 +110,6 @@ void main() {
 
       di.drop<SomeService>();
       expect(di.instanceMap.length, currentObjectLength - 1);
-    });
-
-    test('drop an existing factory', () {
-      final currentObjectLength = di.instanceMap.length;
-
-      di.drop<SyncFactory<SomeService>>();
-      expect(di.instanceMap.length, currentObjectLength - 1);
-    });
-  });
-
-  group('Smart factory', () {
-    final TestRegistry di = TestRegistry.instance;
-    test('put tests', () {
-      final prevLength = di.instanceMap.length;
-
-      di.put(ServiceFactory(
-        (args) => SomeService(args),
-      ));
-
-      expect(di.instanceMap.length, prevLength + 1);
-    });
-
-    test('get tests', () {
-      final serviceFactory = di.get<ServiceFactory>();
-      final serviceInstance = serviceFactory(5);
-
-      expect(serviceInstance.temp, 5);
     });
   });
 }
