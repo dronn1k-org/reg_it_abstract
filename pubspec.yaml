@@ -1,27 +1,23 @@
 name: reg_it_abstract
 description: "Complex abstraction for an implementation of DI Container."
-version: 0.0.1
+version: 1.0.0
 homepage:
 repository: https://github.com/dronn1k-org/reg_it_abstract
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
-  flutter: ">=1.17.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
+  meta: ^1.16.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
+  test: ^1.25.14
+  lints: ^5.1.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-flutter:
 
   # To add assets to your package, add an assets section, like this:
   # assets:

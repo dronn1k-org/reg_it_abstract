@@ -1,6 +1,6 @@
 library reg_it_abstract;
 
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
 abstract interface class Registrar<T> {
   T get instance;
