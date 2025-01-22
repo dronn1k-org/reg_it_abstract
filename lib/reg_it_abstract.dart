@@ -61,18 +61,29 @@ class WeakSingletonRegistrar<T extends Object>
   @override
   final void Function(Registrar<T> registrar)? beforeDispose;
 
+  final T Function() _instanceBuilder;
+
+  WeakSingletonRegistrar(this._instanceBuilder, [this.beforeDispose]);
+
+  WeakReference<T>? _weakReference;
+
   @override
   T get instance {
     if (_weakReference?.target != null) return _weakReference!.target!;
 
-    return (_weakReference = WeakReference(_instanceBuilder())).target!;
+    final instance = _instanceBuilder();
+
+    if (instance is bool || instance is num || instance is String) {
+      return instance;
+    }
+
+    _weakReference = WeakReference(instance);
+
+    return instance;
+
+    // mb it's also works
+    // return (_weakReference = WeakReference(instance)).target!;
   }
-
-  final T Function() _instanceBuilder;
-
-  WeakReference<T>? _weakReference;
-
-  WeakSingletonRegistrar(this._instanceBuilder, [this.beforeDispose]);
 }
 
 abstract interface class Registry {
