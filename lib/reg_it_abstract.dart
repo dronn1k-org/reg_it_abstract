@@ -1,5 +1,7 @@
 library reg_it_abstract;
 
+import 'dart:async';
+
 import 'package:meta/meta.dart';
 
 abstract interface class Registrar<T> {
@@ -24,7 +26,7 @@ class SingletonRegistrar<T> with DisposeHandler<T> implements Registrar<T> {
   @override
   final void Function(Registrar<T> registrar)? beforeDispose;
 
-  const SingletonRegistrar(this.instance, [this.beforeDispose]);
+  const SingletonRegistrar(this.instance, {this.beforeDispose});
 }
 
 class InstanceFactoryRegistrar<T>
@@ -32,7 +34,7 @@ class InstanceFactoryRegistrar<T>
     implements Registrar<T> {
   final T Function() _constructor;
 
-  InstanceFactoryRegistrar(this._constructor, [this.beforeDispose]);
+  InstanceFactoryRegistrar(this._constructor, {this.beforeDispose});
 
   @override
   T get instance => _constructor();
@@ -41,12 +43,16 @@ class InstanceFactoryRegistrar<T>
   final void Function(Registrar<T> registrar)? beforeDispose;
 }
 
+class AsyncFactoryRegistrar<T> extends InstanceFactoryRegistrar<FutureOr<T>> {
+  AsyncFactoryRegistrar(super.constructor, {super.beforeDispose});
+}
+
 class LazySingletonRegistrar<T> with DisposeHandler<T> implements Registrar<T> {
   T? _instance;
 
   final T Function() _constructor;
 
-  LazySingletonRegistrar(this._constructor, [this.beforeDispose]);
+  LazySingletonRegistrar(this._constructor, {this.beforeDispose});
 
   @override
   T get instance => _instance ??= _constructor();
@@ -63,13 +69,14 @@ class WeakSingletonRegistrar<T extends Object>
 
   final T Function() _instanceBuilder;
 
-  WeakSingletonRegistrar(this._instanceBuilder, [this.beforeDispose]);
+  WeakSingletonRegistrar(this._instanceBuilder, {this.beforeDispose});
 
   WeakReference<T>? _weakReference;
 
   @override
   T get instance {
-    if (_weakReference?.target != null) return _weakReference!.target!;
+    final weakInstance = _weakReference?.target;
+    if (weakInstance != null) return weakInstance;
 
     final instance = _instanceBuilder();
 
