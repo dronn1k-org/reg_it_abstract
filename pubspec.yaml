@@ -1,6 +1,6 @@
 name: reg_it_abstract
 description: "Complex abstraction for an implementation of DI Container."
-version: 1.0.0
+version: 1.0.0+1
 homepage:
 repository: https://github.com/dronn1k-org/reg_it_abstract
 
@@ -8,7 +8,7 @@ environment:
   sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
-  meta: ^1.16.0
+  meta: 1.15.0
 
 dev_dependencies:
   test: ^1.25.14

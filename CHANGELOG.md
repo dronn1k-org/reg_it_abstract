@@ -1,3 +1,6 @@
+## 1.0.0+1
+* meta version was changed.
+
 ## 1.0.0
 ### Major changes.
 
