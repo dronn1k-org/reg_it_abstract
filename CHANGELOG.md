@@ -1,3 +1,6 @@
+## 1.0.1+2
+* documentation added.
+
 ## 1.0.0+1
 * meta version was changed.
 
